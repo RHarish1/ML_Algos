@@ -16,7 +16,7 @@ This repository contains Python code for implementing a simple linear regression
 2. **Clone Repository**:
    - Clone this repository to your local machine using Git:
      ```
-     git clone https://github.com/your_username/linear-regression.git
+     git clone https://github.com/RHarish1/linear-regression.git
      ```
 
 3. **Run the Code**:
@@ -31,11 +31,11 @@ This repository contains Python code for implementing a simple linear regression
 - **Evaluation**: The model's performance is evaluated using the coefficient of determination (R^2 score) and mean squared error.
 
 ### Customization:
-- **Dataset**: Replace `File_Name.csv` with your own dataset file in CSV format.
+- **Dataset**: Replace `RHarish1.csv` with your own dataset file in CSV format.
 - **Parameters**: Adjust the test size and random state in the `train_test_split` function for splitting the dataset.
 
 ### Contributors:
-- This project is maintained by [Your Name](https://github.com/your_username).
+- This project is maintained by [Your Name](https://github.com/RHarish1).
 
 ### License:
 - This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
