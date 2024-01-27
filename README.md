@@ -35,7 +35,7 @@ This repository contains Python code for implementing a simple linear regression
 - **Parameters**: Adjust the test size and random state in the `train_test_split` function for splitting the dataset.
 
 ### Contributors:
-- This project is maintained by [Your Name](https://github.com/RHarish1).
+- This project is maintained by [Harish Ramaswamy](https://github.com/RHarish1).
 
 ### License:
 - This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
