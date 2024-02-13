@@ -1,0 +1,152 @@
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+import pydotplus
+from IPython.display import Image
+
+class TreeNode:
+    def __init__(self, feature=None, value=None, results=None, left=None, right=None):
+        """
+        Initialize a tree node.
+
+        Parameters:
+        - feature: Feature to split on
+        - value: Value of the feature to split on
+        - results: Dictionary of results for a branch, None for nodes
+        - left: Left subtree
+        - right: Right subtree
+        """
+        self.feature = feature
+        self.value = value
+        self.results = results
+        self.left = left
+        self.right = right
+
+def calculate_entropy(labels):
+    """
+    Calculate entropy for a set of labels.
+
+    Parameters:
+    - labels: Series of class labels
+
+    Returns:
+    - Entropy value
+    """
+    class_counts = labels.value_counts(normalize=True)
+    entropy_value = -(class_counts * np.log2(class_counts)).sum()
+    return entropy_value
+
+def calculate_information_gain(X, Y, feature):
+    """
+    Calculate information gain for a feature.
+
+    Parameters:
+    - X: DataFrame of features
+    - Y: Series of class labels
+    - feature: Feature to calculate information gain for
+
+    Returns:
+    - Information gain value
+    """
+    original_entropy = calculate_entropy(Y)
+    split_entropy = 0
+    for value in X[feature].unique():
+        subset_indices = X[feature] == value
+        subset_entropy = calculate_entropy(Y[subset_indices])
+        split_entropy += len(Y[subset_indices]) / len(Y) * subset_entropy
+    information_gain = original_entropy - split_entropy
+    return information_gain
+
+def build_decision_tree(X, Y, features):
+    """
+    Build a decision tree.
+
+    Parameters:
+    - X: DataFrame of features
+    - Y: Series of class labels
+    - features: List of feature names
+
+    Returns:
+    - Root node of the decision tree
+    """
+    if len(Y.unique()) == 1:
+        return TreeNode(results=Y.iloc[0])
+    if not features:
+        return TreeNode(results=Y.mode().iloc[0])
+    max_gain, best_feature = 0, features[0]
+    for f in features:
+        current_gain = calculate_information_gain(X, Y, f)
+        if current_gain > max_gain:
+            max_gain = current_gain
+            best_feature = f
+
+    remaining_features = features.copy()
+    remaining_features.remove(best_feature)
+
+    root = TreeNode(feature=best_feature)
+    for value in X[best_feature].unique():
+        subset_indices = X[best_feature] == value
+        X_subset = X.loc[subset_indices]
+        Y_subset = Y.loc[subset_indices]
+        if len(X_subset) == 0:
+            child_node = TreeNode(results=Y.mode().iloc[0])
+        else:
+            if len(remaining_features) == 0 or len(Y_subset.unique()) == 1:
+                child_node = TreeNode(results=Y_subset.mode().iloc[0])
+            else:
+                child_node = build_decision_tree(X_subset, Y_subset, remaining_features)
+        if root.results is None:
+            root.results = {value: child_node}
+        else:
+            root.results[value] = child_node
+    features.remove(best_feature)
+    return root
+
+def visualize_decision_tree(tree):
+    """
+    Visualize a decision tree.
+
+    Parameters:
+    - tree: Root node of the decision tree
+
+    Returns:
+    - Graph object representing the decision tree
+    """
+    dot = pydotplus.Dot()
+    visualize_tree_helper(tree, dot)
+    return dot
+
+def visualize_tree_helper(node, dot, parent_node=None, parent_value=None):
+    """
+    Helper function to visualize a decision tree recursively.
+
+    Parameters:
+    - node: Current node of the decision tree
+    - dot: Graph object representing the decision tree
+    - parent_node: Parent node of the current node
+    - parent_value: Value of the parent node feature
+    """
+    if node.results is not None and isinstance(node.results, dict):
+        root_node = pydotplus.Node(node.feature)
+        dot.add_node(root_node)
+        if parent_node is not None:
+            edge = pydotplus.Edge(parent_node, root_node, label=str(parent_value))
+            dot.add_edge(edge)
+        for value, child_node in node.results.items():
+            visualize_tree_helper(child_node, dot, root_node, value)
+    else:
+        if node.results in label_to_species:  # Check if node result is a species label
+            leaf_species = label_to_species[node.results]
+            leaf_node = pydotplus.Node(str(leaf_species), style="filled", fillcolor="#77dd77")
+            dot.add_node(leaf_node)
+            if parent_node is not None:
+                edge = pydotplus.Edge(parent_node, leaf_node, label=str(parent_value))
+                dot.add_edge(edge)
+        else:
+            leaf_node = pydotplus.Node(str(node.results), style="filled", fillcolor="#77dd77")
+            dot.add_node(leaf_node)
+            if parent_node is not None:
+                edge = pydotplus.Edge(parent_node, leaf_node, label=str(parent_value))
+                dot.add_edge(edge)
+
