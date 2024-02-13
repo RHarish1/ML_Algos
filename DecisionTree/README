@@ -21,7 +21,7 @@ This repository contains an implementation of a decision tree classifier using P
 2. Clone the repository:
 
    ```
-   git clone https://github.com/your_username/decision-tree-implementation.git
+   git clone https://github.com/RHarish1/ML_Algos/tree/main/DecisionTree
    ```
 
 3. Navigate to the project directory:
